@@ -1,24 +1,39 @@
-//
-//  ContentView.swift
-//  RaiderIO
-//
-//  Created by Andrew Ward on 4/6/25.
-//
+
 
 import SwiftUI
+import FirebaseAuth
 
 struct ContentView: View {
+    
+    @AppStorage("uid") var userID: String = ""
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        
+        if userID == "" {
+            AuthView()
+        } else {
+            Text("Logged In! \nYour user id is \(userID)")
+            
+            Button(action: {
+                let firebaseAuth = Auth.auth()
+                do {
+                    try firebaseAuth.signOut()
+                    withAnimation {
+                        userID = ""
+                    }
+                } catch let signOutError as NSError {
+                    print("Error signing out: %@", signOutError)
+                }
+            }) {
+                Text("Sign Out")
+            }
         }
-        .padding()
+        
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
