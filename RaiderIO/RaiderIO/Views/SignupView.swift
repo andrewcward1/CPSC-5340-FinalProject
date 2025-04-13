@@ -1,4 +1,8 @@
- 
+ /*
+  View that provides the ability for the user to create a new account.
+  Documentation at: https://samirrana-18696.medium.com/ios-validation-using-swift-email-password-f1f02277e9e1
+  There may be a better way to do this rather than Regex
+  */
 
 import SwiftUI
 import FirebaseAuth

@@ -1,4 +1,9 @@
+/*
+ View in which the user enters thier username and password to authenticate to the platform.
+ The application checks to ensure the un / pw combination matches what is stored in firebase.
+ */
 
+//TODO: Add some type of notification if the entered credentials are incorrect
 
 import SwiftUI
 import FirebaseAuth
@@ -29,7 +34,7 @@ struct LoginView: View {
             
             VStack {
                 HStack {
-                    Text("Welcome Back!")
+                    Text("Raider IO")
                         .font(.largeTitle)
                         .bold()
                     

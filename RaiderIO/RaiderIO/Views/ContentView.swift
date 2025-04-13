@@ -1,4 +1,9 @@
 
+/*
+ Once authenticated, the screen below is shown.
+ This is our main entry point to the actual application.
+ */
+
 
 import SwiftUI
 import FirebaseAuth
@@ -12,7 +17,7 @@ struct ContentView: View {
         if userID == "" {
             AuthView()
         } else {
-            Text("Logged In! \nYour user id is \(userID)")
+            Text("Welcome to Raider IO!")
             
             Button(action: {
                 let firebaseAuth = Auth.auth()

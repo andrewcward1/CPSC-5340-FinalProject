@@ -1,3 +1,10 @@
+/*
+ The sign-in screen for the application.
+ Provides fields for username and password,
+ as well as the ability to create an account via
+ SignupView.
+ */
+
 
 import SwiftUI
 
