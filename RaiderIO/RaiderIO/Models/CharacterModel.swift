@@ -1,12 +1,12 @@
 /*
  Character model.
- Character parameters are fetched via API call.
+ Character parameters are fetched via API call to RaiderIO API.
  */
 
 import Foundation
+import FirebaseFirestore
 
-
-struct Character: Codable, Identifiable {
+struct Character: Identifiable, Codable {
     let id = UUID()
     let name: String
     let race: String
@@ -15,4 +15,5 @@ struct Character: Codable, Identifiable {
     let thumbnail_url: String
 }
 
-typealias CharacterResponse = [String: [Character]]
+
+

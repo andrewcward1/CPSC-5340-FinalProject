@@ -1,17 +1,50 @@
 /*
  CharacterViewModel.
  Used to fetch character information from RaiderIO API.
- API documentation available at: https://raider.io/api
- https://raider.io/api/v1/characters/profile?region=us&realm=malganis&name=\(characterIn)
+ Characters are also added to Firestore DB on a per account basis.
  */
 
 import SwiftUI
+import FirebaseFirestore
+
 
 class CharacterViewModel: ObservableObject {
     @Published var characters: [Character] = []
+    private var db = Firestore.firestore()
+    @AppStorage("uid") var userID: String = ""
+
+    // Add character to FireStore DB
+    func saveCharacterToFirestore(_ character: Character) {
+        guard !userID.isEmpty else { return }
+        
+        do {
+            let _ = try db.collection("users").document(userID).collection("characters").addDocument(from: character)
+        } catch {
+            print("Error saving character to Firestore: \(error)")
+        }
+    }
     
-    func fetchCharacterData(characterIn: String) {
-        guard let url = URL(string: "https://raider.io/api/v1/characters/profile?region=us&realm=malganis&name=\(characterIn)") else {
+    // Retrieve characters from FireStore DB
+    func loadCharactersFromFirestore() {
+        guard !userID.isEmpty else { return }
+
+        db.collection("users").document(userID).collection("characters").getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching characters: \(error)")
+                return
+            }
+
+            guard let documents = snapshot?.documents else { return }
+            
+            self.characters = documents.compactMap { document in
+                try? document.data(as: Character.self)
+            }
+        }
+    }
+
+
+    func fetchCharacterData(regionIn: String, realmIn: String, characterIn: String) {
+        guard let url = URL(string: "https://raider.io/api/v1/characters/profile?region=\(regionIn)&realm=\(realmIn)&name=\(characterIn)") else {
             print("Invalid URL")
             return
         }
@@ -19,11 +52,10 @@ class CharacterViewModel: ObservableObject {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
                 do {
-                    let decodedResponse = try JSONDecoder().decode(CharacterResponse.self, from: data)
+                    let decodedCharacter = try JSONDecoder().decode(Character.self, from: data)
                     DispatchQueue.main.async {
-                        if let characterData = decodedResponse[characterIn] {
-                            self.characters = characterData
-                        }
+                        self.characters.append(decodedCharacter)
+                        self.saveCharacterToFirestore(decodedCharacter)
                     }
                 } catch {
                     print("Error decoding JSON: \(error)")
@@ -31,4 +63,9 @@ class CharacterViewModel: ObservableObject {
             }
         }.resume()
     }
+    
+    func deleteCharacter(at offsets: IndexSet) {
+           characters.remove(atOffsets: offsets)
+       }
 }
+
